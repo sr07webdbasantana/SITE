@@ -1,0 +1,31 @@
+# Documentação: https://httpd.apache.org/docs/2.4/rewrite/flags.html
+
+# Ativa o motor de reescrita do Apache.
+RewriteEngine On
+
+# ----------------------------------------------------------------------
+# FORÇAR HTTPS (Redirecionamento Automático)
+# ----------------------------------------------------------------------
+# Verifica se o protocolo HTTPS está desligado (off).
+RewriteCond %{HTTPS} off
+# Redireciona permanentemente (R=301) para a versão segura da mesma URL.
+# %{HTTP_HOST} captura o domínio (ex: localhost) e %{REQUEST_URI} o caminho.
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ----------------------------------------------------------------------
+# CONDIÇÕES PARA URL AMIGÁVEL
+# ----------------------------------------------------------------------
+# SE a requisição NÃO for um diretório físico existente...
+RewriteCond %{REQUEST_FILENAME} !-d
+# ...E SE a requisição NÃO for um arquivo físico existente...
+RewriteCond %{REQUEST_FILENAME} !-f
+# ...E SE a requisição NÃO for um link simbólico físico.
+RewriteCond %{REQUEST_FILENAME} !-l
+
+# ----------------------------------------------------------------------
+# REGRA DE REESCRITA (URL AMIGÁVEL)
+# ----------------------------------------------------------------------
+# Redireciona o fluxo para o index.php passando a URL original como parâmetro 'url'.
+# [QSA] Garante que strings de consulta extras (?id=1) sejam anexadas.
+# [L] Define esta como a última regra a ser processada se for atendida.
+RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]
